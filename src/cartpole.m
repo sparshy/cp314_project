@@ -1,5 +1,6 @@
 function dy = cartpole(y,m,M,g,L,d,u)
 %CARTPOLE System dynamics for Cart Pole
+% y = [x , x_dot, theta, theta_dot ]
 Sy = sin(y(3));
 Cy = cos(y(3));
 D = m*L*L*(M+m*(1-Cy^2));

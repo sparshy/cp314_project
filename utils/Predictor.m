@@ -1,4 +1,4 @@
-classdef Predictor
+classdef Predictor < handle
     properties
         T
         H
@@ -33,7 +33,7 @@ classdef Predictor
         end
         
         % Calculates the Gradients
-        function obj = calculateGradients(obj)
+        function calculateGradients(obj)
             obj.gradients = zeros(obj.inputSize,obj.H);
             % Calculating expected values of mean
             noIterationForSampleMean = 10;
@@ -52,13 +52,22 @@ classdef Predictor
             loss = 0;
             [t,X] = obj.propagateHSteps(u);
             for i=1:obj.H
-                loss = loss + 
+                loss = loss + obj.stepCost(X(i,:));
             end
+            loss = loss + obj.stepCost(X(obj.H+1,:)) ;
+        end
+        
+        % Cost of each step
+        function cost = stepCost(obj,x)
+            cost = 10 * x(1)^2  + 500 * (x(3) - pi)^2 + x(2)^2 + 15 * x(4)^2 + 1000 * ( (x(3) - pi) >= 0.21);
         end
         
         % Update theta values
         function updateThetas(obj)
-            
+            for h=1:50
+                val = obj.theta(:,h) .* (exp(- 0.001 * obj.gradients(:,h)) );
+                obj.theta(:,h) = val/sum(val);
+            end
         end
         
     end

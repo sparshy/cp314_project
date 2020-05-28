@@ -1,3 +1,3 @@
 # Getting Started
 
-1. Run `simulate.m`
+1. Run `main.m`
