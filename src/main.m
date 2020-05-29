@@ -1,8 +1,8 @@
+clc;
+clear;
 params;
-
 p = Predictor(T,H, step, [10, 0, -10]);
-
-for i= 1:step:T
+for i= 0:step:T
    % Calculate Loss 
    % Not doing for now, needed for plotting
    
@@ -12,12 +12,16 @@ for i= 1:step:T
    
    % sample u from pi_theta
    u = sample_u_sequence(p.values, p.theta);
-   control = u(1);
+   control = u(1) +  normrnd(0,5,1,1);
    
    % get x_t+1 from f (actual system)
    [t,X] = f(p.cState, control);
    p.cState = X(end,:);
    
    % shift theta
+   p.theta = [ p.theta(:,2:end), [1/3 1/3 1/3]'];
    
+   % Do simulation
+   draw_cartpole(p.cState,0.336);
+   fprintf('time: %f seconds ; control %f N\n', i, control );
 end
