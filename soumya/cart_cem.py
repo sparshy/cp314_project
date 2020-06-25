@@ -52,7 +52,7 @@ def cost_calc(state_trajectory):
         if theta > np.pi:
             deviationFromZero = np.abs(2*np.pi - theta)
         threshold = 0 if deviationFromZero < .21 else 1 
-        cost.append( 10*x**2  + 500*(deviationFromZero)**2 + x_dot**2 + 15*theta_dot**2 + 1000*threshold)
+        cost.append( 100*x**2  + 500*(deviationFromZero)**2 + x_dot**2 + 15*theta_dot**2 + 1000*threshold)
     return sum(cost)
 
 
@@ -60,11 +60,11 @@ def main():
     env = CartPoleEnv()
     control_h= 500
     planning_h= 120
-    trajectories=1000
+    trajectories=100
     f_samples=10
     gamma=0.1
     totalreward=0
-    n_elite=trajectories*0.1
+    n_elite=trajectories*0.5
     next_state=env.reset()
 
     mean=np.full((planning_h), 0)
@@ -75,7 +75,7 @@ def main():
         grads=np.zeros(planning_h)
         cumulative_cost=0
         x, x_dot, theta_value, theta_dot = next_state
-        scaling = 300
+        scaling = 1
         gamma=1
         
         control_elite=np.zeros((trajectories, planning_h))

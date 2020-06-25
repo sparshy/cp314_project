@@ -150,12 +150,12 @@ class CartPoleEnv(gym.Env):
         return np.array(self.state), reward, done, {}
 
     def reset(self):
-        self.state = (0,0,0,0)
+        self.state = (0,0,np.pi,0)
         self.steps_beyond_done = None
         return np.array(self.state)
 
     def render(self, mode='human'):
-        screen_width = 600
+        screen_width = 1000
         screen_height = 400
 
         world_width = self.x_threshold * 2
