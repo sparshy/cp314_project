@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "/home/anu/Documents/p3/bin/python",
+    "autoDocstring.docstringFormat": "google",
+    "python.autoComplete.extraPaths":[
+        "~/Documents/cp314_project/python/"
+    ],
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH" : "~/Documents/cp314_project/python"
+    }
+}
