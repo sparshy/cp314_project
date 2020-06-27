@@ -4,7 +4,7 @@ import random
 import math
 from math import * 
 from envrocket import RocketEnv
-
+from cost import costAnyPointInsertion,costTrajectory
 masscart = 1
 gravity = 9.8
 length = 0.65
@@ -15,31 +15,22 @@ force_mag = 10.0
 tau = 0.02
 pi=3.14
 noise=0
+from dynamics import f_x
 
 def state_trajectory(state, control):
     trajectory=[]
-    x, x_dot, theta, theta_dot = state    
-
+    states = np.array(state)    
+    t = 0 
     for i in range(len(control)):
-        noise = np.random.normal(0,1) # Stochasticity 
-        force = control[i]
-        costheta = math.cos(theta)
-        sintheta = math.sin(theta)
+        k1 = f_x(t, states, control[i])
+        k2 = f_x(t + tau/2, states + tau*k1/2, control[i] )
+        k3 = f_x(t + tau/2, states + tau*k2/2, control[i] )
+        k4 = f_x(t + tau, states + k3, control[i])
 
-        temp = (force + polemass_length * theta_dot ** 2 * sintheta) / total_mass
-        thetaacc = (gravity * sintheta - costheta * temp) / (length * (4.0 / 3.0 - masspole * costheta ** 2 / total_mass))
-        xacc = temp - polemass_length * thetaacc * costheta / total_mass
-
-        x = x + tau * x_dot
-        x_dot = x_dot + tau * xacc
-        theta = theta + tau * theta_dot
-        theta_dot = theta_dot + tau * thetaacc
-        
-        # Clip thetas 
-        theta = theta%(2*np.pi)
-        state=(x,x_dot,theta,theta_dot) #Also theta_dot and x_dot are becoming too high
-        trajectory.append(np.array(state).flatten())
+        newstate = states + tau/6* ( k1 + 2*k2 + 2*k3 + k4)
+        trajectory.append(newstate)
     return trajectory
+
 
 def cost_calc(state_trajectory):
     cost=[]
@@ -85,10 +76,10 @@ def main():
             control= np.array([np.random.normal(m,5) for m in mean])
             control=np.clip(scaling*control, -25, 25)
             if i%10 == 0:
-                noise=np.array([np.random.normal(0,5) for m in mean])       
+                noise=np.array([np.array([np.random.normal(0,5), np.random.normal(0,5)]) for m in mean])       
             control=control+noise
             trajectory=state_trajectory(next_state,control)
-            cost=cost_calc(trajectory)
+            cost=costTrajectory(trajectory)
             cost_elite[i] = cost
             control_elite[i] = control
 
@@ -101,23 +92,18 @@ def main():
         mean=(1-gamma)*mean+gamma*grad_mean
         u= mean[0].copy()
                 
-        control=np.clip(scaling*u, -25, 25)+np.random.normal(0,5)
+        control=np.clip(scaling*u, -25, 25) # +np.random.normal(0,5)
 
-        print("control", control.item())
+        print("control", control)
 
-        env.render()
+        ## TODO Render the Simulation
+        #env.render()
 
-        next_state,reward,done,info = env.step(control.item(),0)
+        next_state = env.step(control)
 
         #shift means
-        mean=np.append(mean[1:],10)
+        mean=np.append(mean[1:], mean[-1][np.newaxis], axis =0) 
 
-        print("next_state",next_state)
-
-        if done:
-            pass
-    print("Total reward", totalreward)
-    env.close()
-
+        print("next_state",next_state, "cost", costAnyPointInsertion(next_state))
 if __name__=="__main__": 
     main()
