@@ -24,7 +24,7 @@ classdef Predictor < handle
             obj.theta = ones(obj.inputSize,H) * 1/3;
             obj.M = 1; 
             obj.N = 4; 
-            obj.cState = [3,0,0,0];
+            obj.cState = [3,0,pi,0];
         end
         
         % Propagate the System Dynamics for H steps
