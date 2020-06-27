@@ -5,14 +5,8 @@ import math
 from math import * 
 from envrocket import RocketEnv
 from cost import costAnyPointInsertion,costTrajectory
-masscart = 1
-gravity = 9.8
-length = 0.65
-masspole =0.1
-polemass_length =masspole *length
-total_mass = masspole + masscart
-force_mag = 10.0
-tau = 0.02
+from params import tau
+
 pi=3.14
 noise=0
 from dynamics import f_x
@@ -48,7 +42,7 @@ def cost_calc(state_trajectory):
 
 def main():
     env = RocketEnv()
-    control_h= 500
+    control_h= 4000
     planning_h= 120
     trajectories=100
     f_samples=10
@@ -57,7 +51,7 @@ def main():
     next_state=env.reset()
 
     mean=np.full((planning_h,2), 0) # Since we have two control variables.
-
+    env.initializePlot()
     for time in range(control_h):
         print("Iteration ------------------", time)       
         
@@ -97,7 +91,7 @@ def main():
         print("control", control)
 
         ## TODO Render the Simulation
-        #env.render()
+        env.render()
 
         next_state = env.step(control)
 
@@ -105,5 +99,6 @@ def main():
         mean=np.append(mean[1:], mean[-1][np.newaxis], axis =0) 
 
         print("next_state",next_state, "cost", costAnyPointInsertion(next_state))
+    env.close()
 if __name__=="__main__": 
     main()
