@@ -12,6 +12,8 @@ def costAnyPointInsertion(state):
     w = state[1]
     r = state[2]
     theta = state[3]
+
+
     return np.abs(r - h**2/(mu * (1 + e * np.cos(theta)))) + \
             np.abs(u - mu * ( 1 + e * np.cos(theta))/ h ) + \
             np.abs(w - mu * e * np.sin(theta)/ h )

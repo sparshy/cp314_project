@@ -3,11 +3,12 @@ from params import u_0,w_0,r_0,theta_0, EARTH_RADIUS, mu,h,e, tau
 from dynamics import f_x
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-
+from cost import costAnyPointInsertion
 class RocketEnv():
     def __init__(self):
         self.rocketTrajctoryR = []
         self.rocketTrajctoryTheta = []
+        self.costs = []
         pass
 
     def reset(self):
@@ -25,6 +26,7 @@ class RocketEnv():
         self.state = states + tau/6* ( k1 + 2*k2 + 2*k3 + k4)
         self.rocketTrajctoryR.append(self.state[2])
         self.rocketTrajctoryTheta.append(self.state[3])
+        self.costs.append(costAnyPointInsertion(self.state))
         return self.state
     
     def initializePlot(self):
@@ -57,6 +59,9 @@ class RocketEnv():
         plt.pause(0.0001)
 
     def close(self):
+        fig2, ax1 = plt.subplots()
+        ax1.plot(self.costs)
+        plt.show()
         np.savez('launcher',
          r=self.rocketTrajctoryR, theta=self.rocketTrajctoryTheta, theta1=self.theta, 
-            earth = self.earth , orbit = self.trajectory)
+            earth = self.earth , orbit = self.trajectory, costs = self.costs)
